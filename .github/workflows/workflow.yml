@@ -14,34 +14,35 @@ jobs:
           fetch-depth: 0 # Fetch all history for accurate results of code analysis
 
       - name: Install required tools
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool, dotnet tool install --global dotnet-stryker
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool && dotnet tool install --global dotnet-stryker
         # Write the commands to install ReportGenerator and Stryker into your pipeline.
 
       - name: Run unit tests
-        run: dotnet test --collect:"XPlat Code Coverage"
+        run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
         # Write a command to execute unit tests while collecting code coverage
         
       - name: Generate report
-        run: dotnet reportgenerator -reports:coverage.cobertura.xml -targetdir:coverage-report
+        run: dotnet reportgenerator -reports:TestResults/**/coverage.cobertura.xml -targetdir:coverage-report
         # Use the ReportGenerator tool to generate a report from the code coverage results
 
       - name: Run Mutation Tests
-        run: ddotnet stryker --threshold-high 80
+        run: dotnet stryker --threshold-high 80
         # Write a command to execute mutation tests using Stryker with a threshold of 80% mutation score
 
       - name: Collect Coverage Report
         if: always()
         uses: actions/upload-artifact@v4
-            where: 
-            name: coverage-report
+        with:
+          name: coverage-report
+          path: coverage-report/
         
         # Complete this step sp it uploads the coverage report to the artifacts - make it run always even if previous steps fail
 
       - name: Collect Stryker Report
         if: always() 
         uses: actions/upload-artifact@v4
-            where: 
-            name: stryker-report
+        with:
+          name: stryker-report
+          path: StrykerOutput/
         
         # Complete this step so it uploads the Stryker report to the artifacts - make it run always even if previous steps fail
-    
