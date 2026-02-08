@@ -31,12 +31,12 @@ jobs:
 
       - name: Collect Coverage Report
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         
         # Complete this step sp it uploads the coverage report to the artifacts - make it run always even if previous steps fail
 
       - name: Collect Stryker Report
         if: always() 
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         # Complete this step so it uploads the Stryker report to the artifacts - make it run always even if previous steps fail
     
