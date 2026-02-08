@@ -1,0 +1,42 @@
+name: workflow.yml
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for accurate results of code analysis
+
+      - name: Install required tools
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool, dotnet tool install --global dotnet-stryker
+        # Write the commands to install ReportGenerator and Stryker into your pipeline.
+
+      - name: Run unit tests
+        run: dotnet test --collect:"XPlat Code Coverage"
+        # Write a command to execute unit tests while collecting code coverage
+        
+      - name: Generate report
+        run: dotnet reportgenerator -reports:coverage.cobertura.xml -targetdir:coverage-report
+        # Use the ReportGenerator tool to generate a report from the code coverage results
+
+      - name: Run Mutation Tests
+        run: ddotnet stryker --threshold-high 80
+        # Write a command to execute mutation tests using Stryker with a threshold of 80% mutation score
+
+      - name: Collect Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        
+        # Complete this step sp it uploads the coverage report to the artifacts - make it run always even if previous steps fail
+
+      - name: Collect Stryker Report
+        if: always() 
+        uses: actions/upload-artifact@v3
+        # Complete this step so it uploads the Stryker report to the artifacts - make it run always even if previous steps fail
+    
